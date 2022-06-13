@@ -37,6 +37,8 @@ igframe_main() {
 }
 
 igframe_process() {
+	[ $# -lt 1 ] && _fatal $e_args "Must specify input."
+
 	local input
 	local output
 
@@ -87,6 +89,14 @@ _error() {
 
 _extname() {
 	echo "$input" | sed -E 's/^[^\.]+//'
+}
+
+_fatal() {
+	local exit_code
+	exit_code="$1"
+	shift
+	_error "$@"
+	exit "$exit_code"
 }
 
 _invalid_cmd() {

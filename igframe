@@ -12,7 +12,7 @@ igframe_main() {
 	[ -z "$BORDER" ] && BORDER=0
 	[ -z "$COLOR" ] && COLOR=white
 
-	while getopts bBch opt
+	while getopts bBc:h opt
 	do
 		case $opt in
 			b) BORDER=1 ;;
@@ -37,15 +37,18 @@ igframe_main() {
 }
 
 igframe_process() {
-  [ $# -lt 1 ] && _fatal $e_args "Must specify input."
-
 	local input
 	local output
 
 	input="$1"
 	output="$2"
 
-	[ -z "$output" ] && output="` basename "$input" `-out` _extname "$input" `"
+	if [ -z "$output" ]
+	then
+		local extname
+		extname="` _extname "$input" `"
+		output="` basename "$input" "$extname" `-out$extname"
+	fi
 
 	magick convert \
 		-bordercolor "$COLOR" -border 5%x \
@@ -61,11 +64,14 @@ Usage: $scriptname [options] input [output]
 
 Fit image into a square frame fit for Instagram.
 
+If output name is not specified, the same name than the input will be used,
+suffixed by '-out'.
+
 Available options:
 
 	-b        Add border, or passe-partout, around picture.
 	-B        Do not add border.
-	-c        Specify colour by name of hex value (e.g. #0011aa). Defaults to white.
+	-c        Specify colour by name of hex value (e.g. #0011aa). Defaults to 'white'.
 	-h        Show this help screen.
 
 USAGE
@@ -77,14 +83,6 @@ _echo() {
 
 _error() {
 	_echo "$@" >&2
-}
-
-_fatal() {
-  local exit_code
-  exit_code=$1
-  shift
-	_error "$@"
-  exit $exit_code
 }
 
 _extname() {

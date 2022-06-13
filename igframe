@@ -1,0 +1,108 @@
+#!/bin/sh
+# igframe
+# Fit image into a square frame fit for Instagram.
+
+igframe_main() {
+	scriptpath="` realpath "$0" `"
+	scriptname="` basename "$scriptpath" `"
+	scriptdir="` dirname "$scriptpath" `"
+
+	e_args=16
+
+	[ -z "$BORDER" ] && BORDER=0
+	[ -z "$COLOR" ] && COLOR=white
+
+	while getopts bBch opt
+	do
+		case $opt in
+			b) BORDER=1 ;;
+			B) BORDER=0 ;;
+			c) COLOR="$OPTARG" ;;
+			h) igframe_usage && return ;;
+			*) _invalid_opt ;;
+		esac
+	done
+
+	shift ` expr $OPTIND - 1 `
+
+	[ -z "$cmd" ] && cmd="process"
+
+	case "$cmd" in
+		process) "igframe_$cmd" "$@" ;;
+		help|usage) igframe_usage ;;
+		*) _invalid_cmd ;;
+	esac
+
+	return $?
+}
+
+igframe_process() {
+  [ $# -lt 1 ] && _fatal $e_args "Must specify input."
+
+	local input
+	local output
+
+	input="$1"
+	output="$2"
+
+	[ -z "$output" ] && output="` basename "$input" `-out` _extname "$input" `"
+
+	magick convert \
+		-bordercolor "$COLOR" -border 5%x \
+		-virtual-pixel background -background "$COLOR" \
+		-set option:distort:viewport "%[fx:max(w,h)]x%[fx:max(w,h)]-%[fx:max((h-w)/2,0)]-%[fx:max((w-h)/2,0)]" \
+		-distort SRT 0 -filter point \
+		"$input" "$output"
+}
+
+igframe_usage() {
+cat <<USAGE
+Usage: $scriptname [options] input [output]
+
+Fit image into a square frame fit for Instagram.
+
+Available options:
+
+	-b        Add border, or passe-partout, around picture.
+	-B        Do not add border.
+	-c        Specify colour by name of hex value (e.g. #0011aa). Defaults to white.
+	-h        Show this help screen.
+
+USAGE
+}
+
+_echo() {
+	echo "$@"
+}
+
+_error() {
+	_echo "$@" >&2
+}
+
+_fatal() {
+  local exit_code
+  exit_code=$1
+  shift
+	_error "$@"
+  exit $exit_code
+}
+
+_extname() {
+	echo "$input" | sed -E 's/^[^\.]+//'
+}
+
+_invalid_cmd() {
+	_error "Invalid command: $cmd"
+	_echo
+	igframe_usage
+	exit $e_args
+}
+
+_invalid_opt() {
+	_error "Invalid option: $opt"
+	_echo
+	igframe_usage
+	exit $e_args
+}
+
+igframe_main "$@"

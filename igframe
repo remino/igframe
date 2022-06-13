@@ -58,6 +58,8 @@ igframe_process() {
 		-set option:distort:viewport "%[fx:max(w,h)]x%[fx:max(w,h)]-%[fx:max((h-w)/2,0)]-%[fx:max((w-h)/2,0)]" \
 		-distort SRT 0 -filter point \
 		"$input" "$output"
+
+	_echo "$output"
 }
 
 igframe_usage() {

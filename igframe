@@ -2,6 +2,8 @@
 # igframe
 # Fit image into a square frame fit for Instagram.
 
+VERSION="1.0.0"
+
 igframe_main() {
 	scriptpath="$( realpath "$0" )"
 	scriptname="$( basename "$scriptpath" )"
@@ -11,13 +13,14 @@ igframe_main() {
 	[ -z "$BORDER" ] && BORDER=0
 	[ -z "$COLOR" ] && COLOR=white
 
-	while getopts bBc:h opt
+	while getopts bBc:hv opt
 	do
 		case $opt in
 			b) BORDER=1 ;;
 			B) BORDER=0 ;;
 			c) COLOR="$OPTARG" ;;
-			h) igframe_usage && return ;;
+			h) cmd=help ;;
+			v) cmd=version ;;
 			*) _invalid_opt ;;
 		esac
 	done
@@ -27,8 +30,7 @@ igframe_main() {
 	[ -z "$cmd" ] && cmd="process"
 
 	case "$cmd" in
-		process) "igframe_$cmd" "$@" ;;
-		help|usage) igframe_usage ;;
+		help|process|version) "igframe_$cmd" "$@" ;;
 		*) _invalid_cmd ;;
 	esac
 
@@ -60,8 +62,10 @@ igframe_process() {
 	_echo "$output"
 }
 
-igframe_usage() {
+igframe_help() {
 cat <<USAGE
+$scriptname $VERSION
+
 Usage: $scriptname [options] input [output]
 
 Fit image into a square frame fit for Instagram.
@@ -77,6 +81,10 @@ Available options:
 	-h        Show this help screen.
 
 USAGE
+}
+
+igframe_version() {
+	_echo "$scriptname $VERSION"
 }
 
 _echo() {

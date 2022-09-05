@@ -3,9 +3,8 @@
 # Fit image into a square frame fit for Instagram.
 
 igframe_main() {
-	scriptpath="` realpath "$0" `"
-	scriptname="` basename "$scriptpath" `"
-	scriptdir="` dirname "$scriptpath" `"
+	scriptpath="$( realpath "$0" )"
+	scriptname="$( basename "$scriptpath" )"
 
 	e_args=16
 
@@ -23,7 +22,7 @@ igframe_main() {
 		esac
 	done
 
-	shift ` expr $OPTIND - 1 `
+	shift $(( OPTIND - 1 ))
 
 	[ -z "$cmd" ] && cmd="process"
 
@@ -39,21 +38,20 @@ igframe_main() {
 igframe_process() {
 	[ $# -lt 1 ] && _fatal $e_args "Must specify input."
 
-	local input
-	local output
-
 	input="$1"
 	output="$2"
 
 	if [ -z "$output" ]
 	then
-		local extname
-		extname="` _extname "$input" `"
-		output="` basename "$input" "$extname" `-out$extname"
+		extname="$( _extname "$input" )"
+		output="$( basename "$input" "$extname" )-out$extname"
 	fi
 
+	border_size=0
+	[ $BORDER -ne 0 ] && border_size=5%x
+
 	magick convert \
-		-bordercolor "$COLOR" -border 5%x \
+		-bordercolor "$COLOR" -border "$border_size" \
 		-virtual-pixel background -background "$COLOR" \
 		-set option:distort:viewport "%[fx:max(w,h)]x%[fx:max(w,h)]-%[fx:max((h-w)/2,0)]-%[fx:max((w-h)/2,0)]" \
 		-distort SRT 0 -filter point \
@@ -94,7 +92,6 @@ _extname() {
 }
 
 _fatal() {
-	local exit_code
 	exit_code="$1"
 	shift
 	_error "$@"

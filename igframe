@@ -1,8 +1,8 @@
 #!/bin/sh
 # igframe
-# Fit image into a square frame fit for Instagram.
+# Fit an image into a specific ratio for Instagram.
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 igframe_main() {
 	scriptpath="$( realpath "$0" )"
@@ -13,13 +13,21 @@ igframe_main() {
 	[ -z "$BORDER" ] && BORDER=0
 	[ -z "$COLOR" ] && COLOR=white
 
-	while getopts bBc:hv opt
+	ratio=square
+	sharpen=0
+
+	while getopts abBc:hlpstv opt
 	do
 		case $opt in
+			a) sharpen=1 ;;
 			b) BORDER=1 ;;
 			B) BORDER=0 ;;
 			c) COLOR="$OPTARG" ;;
 			h) cmd=help ;;
+			l) ratio=landscape ;;
+			p) ratio=portrait ;;
+			s) ratio=square ;;
+			t) ratio=story ;;
 			v) cmd=version ;;
 			*) _invalid_opt ;;
 		esac
@@ -50,14 +58,32 @@ igframe_process() {
 	fi
 
 	border_size=0
-	[ $BORDER -ne 0 ] && border_size=5%x
+	[ $BORDER -ne 0 ] && border_size=66
 
-	magick convert \
-		-bordercolor "$COLOR" -border "$border_size" \
-		-virtual-pixel background -background "$COLOR" \
-		-set option:distort:viewport "%[fx:max(w,h)]x%[fx:max(w,h)]-%[fx:max((h-w)/2,0)]-%[fx:max((w-h)/2,0)]" \
-		-distort SRT 0 -filter point \
-		"$input" "$output"
+	out_w=1080
+
+	case "$ratio" in
+		landscape) out_h=810 ;;
+		portrait) out_h=1350 ;;
+		story) out_h=1920 ;;
+		*) out_h=$out_w ;; # square
+	esac
+
+	sharpen_arg=
+	[ $sharpen -ne 0 ] && sharpen_arg="-sharpen 0x2"
+
+	magick \
+		"$input" \
+		-distort SRT 0 \
+		-filter point \
+		-thumbnail "$(( out_w - border_size ))x$(( out_h - border_size ))\>" \
+		$sharpen_arg \
+		-gravity center \
+		-crop "${out_w}x${out_h}+0+0!" \
+		-background "$COLOR" \
+		-flatten \
+		"$output" \
+	;
 
 	_echo "$output"
 }
@@ -66,19 +92,25 @@ igframe_help() {
 cat <<USAGE
 $scriptname $VERSION
 
-Usage: $scriptname [options] input [output]
+USAGE: $scriptname [<options>] <input> [<output>]
 
-Fit image into a square frame fit for Instagram.
+Fit an image into a specific ratio for Instagram.
 
 If output name is not specified, the same name than the input will be used,
 suffixed by '-out'.
 
-Available options:
+OPTIONS:
 
+	-a        Sharpen resized image.
 	-b        Add border, or passe-partout, around picture.
 	-B        Do not add border.
-	-c        Specify colour by name of hex value (e.g. #0011aa). Defaults to 'white'.
+	-c        Specify background colour by name or hex value (e.g. #0011aa). Defaults to 'white'.
+	-s        Use square ratio (1:1, 1080x1080). (Default.)
 	-h        Show this help screen.
+	-l        Use landscape ratio (4:3, 1080x810).
+	-p        Use portrait ratio (4:5, 1080x1350).
+	-t        Use story ratio (9:16, 1080x1920).
+	-v        Show version.
 
 USAGE
 }

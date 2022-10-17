@@ -2,7 +2,7 @@
 # igframe
 # Fit an image into a specific ratio for Instagram.
 
-VERSION="1.1.1"
+VERSION="1.1.2"
 
 igframe_main() {
 	scriptpath="$( readlink -f "$0" )"

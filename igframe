@@ -47,7 +47,7 @@ igframe_main() {
 }
 
 igframe_process() {
-	[ $# -lt 1 ] && _fatal $e_args "Must specify input."
+	[ $# -lt 1 ] && _fatal $e_args "Must specify input. See -h for details."
 
 	_require magick
 

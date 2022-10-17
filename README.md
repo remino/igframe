@@ -15,8 +15,6 @@ Fit an image into a specific ratio for Instagram.
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
-- [Acknowledgments](#acknowledgments)
 
 
 
@@ -100,23 +98,3 @@ Don't forget to give the project a star! Thanks again!
 Distributed under the ISC License. See `LICENSE.txt` for more information.
 
 [Back to top](#igframe)
-
-
-
-## Contact
-
-Rémino Rem
-https://remino.net/
-
-[Back to top](#igframe)
-
-
-
-## Acknowledgments
-
-* []()
-* []()
-* []()
-
-[Back to top](#igframe)
-

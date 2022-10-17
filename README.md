@@ -10,6 +10,8 @@ Fit an image into a specific ratio for Instagram.
 - [Getting Started](#getting-started)
 	- [Prerequisites](#prerequisites)
 	- [Installation](#installation)
+		- [Using Homebrew on macOS](#using-homebrew-on-macos)
+		- [Using git](#using-git)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
@@ -26,19 +28,20 @@ Fit an image into a specific ratio for Instagram.
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-    ```sh
-    git clone https://github.com/github_username/repo_name.git
-    ```
-3. Install NPM packages
-    ```sh
-    npm install
-    ```
-4. Enter your API in `config.js`
-    ```js
-    const API_KEY = 'ENTER YOUR API';
-    ```
+#### Using Homebrew on macOS
+
+```sh
+brew tap remino/remino
+brew install igframe
+igframe -h
+```
+#### Using git
+
+```sh
+git clone https://github.com/remino/igframe.git
+cd igframe
+./igframe -h
+```
 
 [Back to top](#igframe)
 

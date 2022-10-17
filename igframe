@@ -9,6 +9,7 @@ igframe_main() {
 	scriptname="$( basename "$scriptpath" )"
 
 	e_args=16
+	e_missing_app=17
 
 	[ -z "$BORDER" ] && BORDER=0
 	[ -z "$COLOR" ] && COLOR=white
@@ -48,6 +49,8 @@ igframe_main() {
 igframe_process() {
 	[ $# -lt 1 ] && _fatal $e_args "Must specify input."
 
+	_require magick
+
 	input="$1"
 	output="$2"
 
@@ -72,6 +75,7 @@ igframe_process() {
 	sharpen_arg=
 	[ $sharpen -ne 0 ] && sharpen_arg="-sharpen 0x2"
 
+	# shellcheck disable=SC2086
 	magick \
 		"$input" \
 		-distort SRT 0 \
@@ -150,6 +154,24 @@ _invalid_opt() {
 	_echo
 	igframe_usage
 	exit $e_args
+}
+
+_require() {
+	missing_bin=0
+
+	for bin in "$@"
+	do
+		if ! which "$bin" > /dev/null 2>&1
+		then
+			missing_bin=1
+			_error "Required: $bin"
+		fi
+	done
+
+	if [ $missing_bin -ne 0 ]
+	then
+		_fatal "$e_missing_app" "One or more executables or apps are missing."
+	fi
 }
 
 igframe_main "$@"

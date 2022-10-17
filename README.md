@@ -50,7 +50,7 @@ cd igframe
 ## Usage
 
 ```
-igframe 1.1.1
+igframe 1.1.2
 
 USAGE: igframe [<options>] <input> [<output>]
 
